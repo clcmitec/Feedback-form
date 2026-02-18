@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Form</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+.container {
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  width: 100%;
+  max-width: 480px;
+}
+h2 {
+  margin-top: 0;
+  font-size: 24px;
+  text-align: center;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+input[type=text], select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+textarea { resize: none; }
+.rating {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.rating input {
+  display: none;
+}
+.rating label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+.rating input:checked + label {
+  background: #2c5364;
+  color: white;
+  border-color: #2c5364;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #2c5364;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+button:hover { background: #203a43; }
+.popup-overlay {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.3s;
+}
+.popup-overlay.active {
+  visibility: visible;
+  opacity: 1;
+}
+.popup {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  width: 90%;
+  max-width: 350px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.popup h3 { margin-top:0; }
+.popup button {
+  margin-top:12px;
+  padding: 10px 18px;
+  background: #2c5364;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.popup button:hover { background: #203a43; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Feedback Form</h2>
+  <form id="feedbackForm">
+    <div class="form-group">
+      <label>Name (Optional)</label>
+      <input type="text" id="name" placeholder="Leave blank if anonymous">
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="category" required>
+        <option value="">Select Category</option>
+        <option>System Issue</option>
+        <option>Payroll</option>
+        <option>Supervisor</option>
+        <option>Scheduling</option>
+        <option>Suggestion</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="rating">
+        <input type="radio" id="bad" name="rating" value="Bad" required>
+        <label for="bad">😒 Bad</label>
+        <input type="radio" id="okay" name="rating" value="Okay">
+        <label for="okay">😐 Okay</label>
+        <input type="radio" id="good" name="rating" value="Good">
+        <label for="good">🙂 Good</label>
+        <input type="radio" id="great" name="rating" value="Great">
+        <label for="great">🔥 Great</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea id="message" rows="4" placeholder="Your feedback..." required></textarea>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+<div class="popup-overlay" id="successPopup">
+  <div class="popup">
+    <h3>Feedback Submitted!</h3>
+    <p>Thank you for your input.</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<script>
+const form = document.getElementById("feedbackForm");
+const popup = document.getElementById("successPopup");
+
+// ✅ Replace this with your Apps Script Web App URL
+const scriptURL = "https://script.google.com/macros/s/AKfycbz9GZMn1ycankqfiOGzW8_v4-61mFKsHpLnfNNKi8-YvByrpNA3AiiSXyCC4SLJfrlsNw/exec";
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const payload = {
+    name: document.getElementById("name").value || "Anonymous",
+    category: document.getElementById("category").value,
+    rating: document.querySelector('input[name="rating"]:checked').value,
+    message: document.getElementById("message").value
+  };
+  
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    popup.classList.add("active");
+    form.reset();
+  })
+  .catch(err => alert("Submission failed. Try again."));
+});
+
+function closePopup() {
+  popup.classList.remove("active");
+}
+</script>
+
+</body>
+  </html>
